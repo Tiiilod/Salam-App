@@ -13,15 +13,6 @@ class PrayerScheduleScreen extends StatefulWidget {
 }
 
 class _PrayerScheduleScreenState extends State<PrayerScheduleScreen> {
-  // Daftar wilayah di Indonesia untuk Dropdown
-  final List<String> _regions = [
-    'Jakarta',
-    'Surabaya',
-    'Medan',
-    'Makassar',
-    'Bandung'
-  ];
-
   String _selectedRegion = 'Jakarta';
   List<PrayerTime> _prayerList = [];
   bool _isLoading = true;
@@ -33,7 +24,7 @@ class _PrayerScheduleScreenState extends State<PrayerScheduleScreen> {
     _fetchPrayerTimes(_selectedRegion);
   }
 
-  // Fungsi mengambil data API berdasarkan kota yang dipilih
+  // Fungsi mengambil data API berdasarkan kota yang diinput pengguna
   Future<void> _fetchPrayerTimes(String city) async {
     setState(() {
       _isLoading = true;
@@ -63,7 +54,7 @@ class _PrayerScheduleScreenState extends State<PrayerScheduleScreen> {
         });
       } else {
         setState(() {
-          _errorMessage = 'Gagal memuat data dari server';
+          _errorMessage = 'Kota tidak ditemukan atau gagal memuat data';
           _isLoading = false;
         });
       }
@@ -75,13 +66,102 @@ class _PrayerScheduleScreenState extends State<PrayerScheduleScreen> {
     }
   }
 
+  // MENAMPILKAN INPUT PENCARIAN UNTUK SELURUH KOTA
+  void _showCitySearchDialog() {
+    final TextEditingController _searchController = TextEditingController(text: _selectedRegion);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Membuat bottom sheet bisa naik saat keyboard muncul
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, // Menyesuaikan tinggi keyboard
+            top: 24,
+            left: 24,
+            right: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Cari Kota di Indonesia",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Ketikkan nama kota atau kabupaten (Contoh: Bandung, Medan, Malang, dll.)",
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+              const SizedBox(height: 16),
+              
+              // Kolom Input Teks Pencarian
+              TextField(
+                controller: _searchController,
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  hintText: "Masukkan nama kota...",
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF2E7D32)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 2),
+                  ),
+                ),
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    Navigator.pop(context, value.trim());
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+              
+              // Tombol Konfirmasi
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E7D32),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    if (_searchController.text.trim().isNotEmpty) {
+                      Navigator.pop(context, _searchController.text.trim());
+                    }
+                  },
+                  child: const Text("Cari Jadwal", style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    ).then((newValue) {
+      if (newValue != null && newValue is String) {
+        setState(() {
+          _selectedRegion = newValue;
+        });
+        _fetchPrayerTimes(newValue); // Ambil data jadwal sholat berdasarkan input kota baru
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (OverscrollIndicatorNotification overscroll) {
-          overscroll.disallowIndicator(); // Menghilangkan animasi scroll membal
+          overscroll.disallowIndicator();
           return true;
         },
         child: SingleChildScrollView(
@@ -116,34 +196,30 @@ class _PrayerScheduleScreenState extends State<PrayerScheduleScreen> {
                     ),
                     const SizedBox(height: 20),
                     
-                    // --- DROPDOWN PILIHAN WILAYAH ---
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white30),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedRegion,
-                          dropdownColor: const Color(0xFF2E7D32),
-                          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
-                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                          items: _regions.map((String region) {
-                            return DropdownMenuItem<String>(
-                              value: region,
-                              child: Text(region),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedRegion = newValue;
-                              });
-                              _fetchPrayerTimes(newValue); // Ambil data baru dari API saat dropdown berubah
-                            }
-                          },
+                    // --- BAGIAN YANG DIUBAH (INPUT BAGIAN WARNA PINK) ---
+                    // Mengubah dropdown menjadi tombol pencarian input teks
+                    InkWell(
+                      onTap: _showCitySearchDialog,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Ink(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white30),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.search, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              _selectedRegion,
+                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 20),
+                          ],
                         ),
                       ),
                     )

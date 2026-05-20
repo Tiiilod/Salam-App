@@ -9,10 +9,11 @@ import '../models/prayer_time.dart';
 import '../widgets/prayer_tile.dart';
 import '../widgets/prayer_countdown.dart';
 import '../widgets/doa_button.dart';
-import '../screens/doa_list_screen.dart'; 
+import '../screens/doa_list_screen.dart';
 import '../widgets/doa_dialog.dart';
-import '../screens/qiblah_screen.dart'; 
-import '../screens/dzikir_screen.dart'; // Import halaman dzikir baru
+import '../screens/qiblah_screen.dart';
+import '../screens/dzikir_pagi_screen.dart'; // Import halaman khusus Dzikir Pagi
+import '../screens/dzikir_petang_screen.dart'; // Import halaman khusus Dzikir Petang
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -34,11 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchPrayerTimes();
   }
 
-  // Fungsi mengambil data jadwal sholat hari ini dari API AlAdhan
+  // Fungsi mengambil data jadwal sholat dari API AlAdhan
   Future<void> _fetchPrayerTimes() async {
     const String city = 'Jakarta';
     const String country = 'Indonesia';
-    const String url = 'https://api.aladhan.com/v1/timingsByCity?city=$city&country=$country&method=20';
+    const String url =
+        'https://api.aladhan.com/v1/timingsByCity?city=$city&country=$country&method=3';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -62,8 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         setState(() {
           _prayerList = loadedPrayers;
-          _hijriDate = '${hijri['day']} ${hijri['month']['en']} ${hijri['year']}';
-          _gregorianDate = '${gregorian['day']} ${gregorian['month']['en']} ${gregorian['year']}';
+          _hijriDate =
+              '${hijri['day']} ${hijri['month']['en']} ${hijri['year']}';
+          _gregorianDate =
+              '${gregorian['day']} ${gregorian['month']['en']} ${gregorian['year']}';
           _isLoading = false;
         });
       } else {
@@ -87,10 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // Menampilkan logo "Salam" di sisi kiri AppBar
+        // Logo Salam di pojok kiri atas
         title: Image.asset(
-          'assets/images/salam_logo.png', 
-          height: 28,                     
+          'assets/images/salam_logo.png',
+          height: 28,
           fit: BoxFit.contain,
           alignment: Alignment.centerLeft,
           errorBuilder: (context, error, stackTrace) {
@@ -125,14 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         Image.asset(
                           'assets/images/salam_logo.png',
                           height: 40,
-                          errorBuilder: (context, error, stackTrace) => const Text(
-                            'Salam',
-                            style: TextStyle(
-                              color: Color(0xFF1B5E20),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 28,
-                            ),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Text(
+                                'Salam',
+                                style: TextStyle(
+                                  color: Color(0xFF1B5E20),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 28,
+                                ),
+                              ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -171,11 +176,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
                           foregroundColor: const Color(0xFF2E7D32),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                         ),
                         child: const Text(
                           'Tutup',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ],
@@ -186,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // Mematikan efek bounce/glow animasi ketika di-scroll
+      // Mematikan efek animasi overscroll (glow/bounce) saat ditarik
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (OverscrollIndicatorNotification overscroll) {
           overscroll.disallowIndicator();
@@ -199,13 +210,19 @@ class _HomeScreenState extends State<HomeScreen> {
               // Info Tanggal Hijriah & Masehi riil dari API
               Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.calendar_today, color: Color(0xFF2E7D32)),
+                        const Icon(
+                          Icons.calendar_today,
+                          color: Color(0xFF2E7D32),
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           _hijriDate,
@@ -225,40 +242,90 @@ class _HomeScreenState extends State<HomeScreen> {
               // Penampil Status Waktu Sholat Terdekat & Countdown Bersih
               const PrayerCountdown(),
 
-              // List Jadwal Waktu Sholat
-              if (_isLoading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40.0),
-                  child: Center(child: CircularProgressIndicator(color: Color(0xFF2E7D32))),
-                )
-              else if (_errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40.0),
-                  child: Center(
-                    child: Text(
-                      _errorMessage,
-                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _prayerList.length,
-                  itemBuilder: (context, index) {
-                    return PrayerTile(prayer: _prayerList[index]);
-                  },
+              // =============================================================
+              // KOTAK CONTAINER BACKGROUND HIJAU UNTUK JADWAL SHOLAT
+              // =============================================================
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
                 ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: _isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 40.0),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : _errorMessage.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40.0),
+                          child: Center(
+                            child: Text(
+                              _errorMessage,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Theme(
+                          // Mengubah warna teks default & ikon di dalam PrayerTile menjadi Putih
+                          data: Theme.of(context).copyWith(
+                            textTheme: const TextTheme(
+                              bodyLarge: TextStyle(color: Colors.white),
+                              bodyMedium: TextStyle(color: Colors.white),
+                            ),
+                            iconTheme: const IconThemeData(color: Colors.white),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _prayerList.length,
+                            itemBuilder: (context, index) {
+                              // Agar item di dalam menyatu bersih tanpa card bawaan masing-masing
+                              return PrayerTile(prayer: _prayerList[index]);
+                            },
+                          ),
+                        ),
+                ),
+              ),
+              // =============================================================
 
               // Tombol Menu Arah Kiblat
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
                 child: InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const QiblahScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const QiblahScreen(),
+                      ),
                     );
                   },
                   borderRadius: BorderRadius.circular(16),
@@ -276,13 +343,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.green.withOpacity(0.2),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
-                        )
+                        ),
                       ],
                     ),
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.explore, 
+                          Icons.explore,
                           color: Colors.white,
                           size: 30,
                         ),
@@ -320,25 +387,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // ==========================================
-              // MENU DZIKIR PAGI & PETANG (AREA KUNING)
-              // ==========================================
+              // MENU DZIKIR PAGI & PETANG (NAVIGASI HALAMAN KHUSUS)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 4.0,
+                ),
                 child: Row(
                   children: [
-                    // Tombol Dzikir Pagi
+                    // Tombol Dzikir Pagi -> Mengarah ke DzikirPagiScreen
                     Expanded(
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const DzikirScreen(jenisDzikir: 'Pagi')),
+                            MaterialPageRoute(
+                              builder: (context) => const DzikirPagiScreen(),
+                            ),
                           );
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -348,16 +421,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.black.withOpacity(0.02),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
-                              )
+                              ),
                             ],
                           ),
                           child: Row(
                             children: const [
-                              Icon(Icons.wb_sunny_outlined, color: Colors.amber, size: 22),
+                              Icon(
+                                Icons.wb_sunny_outlined,
+                                color: Colors.amber,
+                                size: 22,
+                              ),
                               SizedBox(width: 10),
                               Text(
                                 "Dzikir Pagi",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ],
                           ),
@@ -365,18 +446,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Tombol Dzikir Petang
+                    // Tombol Dzikir Petang -> Mengarah ke DzikirPetangScreen
                     Expanded(
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const DzikirScreen(jenisDzikir: 'Petang')),
+                            MaterialPageRoute(
+                              builder: (context) => const DzikirPetangScreen(),
+                            ),
                           );
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -386,16 +472,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.black.withOpacity(0.02),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
-                              )
+                              ),
                             ],
                           ),
                           child: Row(
                             children: const [
-                              Icon(Icons.dark_mode_outlined, color: Colors.indigo, size: 22),
+                              Icon(
+                                Icons.dark_mode_outlined,
+                                color: Colors.indigo,
+                                size: 22,
+                              ),
                               SizedBox(width: 10),
                               Text(
                                 "Dzikir Petang",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ],
                           ),
@@ -405,7 +499,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              // ==========================================
 
               const SizedBox(height: 12),
 
@@ -417,7 +510,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const Text(
                       'Doa Harian',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
@@ -485,7 +581,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 80), // Jarak aman dasar dari Bottom Navigation Bar
+              const SizedBox(
+                height: 80,
+              ), // Jarak aman dari Bottom Navigation Bar
             ],
           ),
         ),
