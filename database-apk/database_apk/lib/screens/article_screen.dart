@@ -24,7 +24,11 @@ class ArticleScreen extends StatelessWidget {
               titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
               title: const Text(
                 'Artikel Kajian Islami',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
               ),
               background: Container(
                 decoration: const BoxDecoration(
@@ -36,12 +40,16 @@ class ArticleScreen extends StatelessWidget {
                 ),
                 child: Opacity(
                   opacity: 0.1,
-                  child: Icon(Icons.menu_book, size: 150, color: Colors.white.withOpacity(0.3)),
+                  child: Icon(
+                    Icons.menu_book,
+                    size: 150,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
                 ),
               ),
             ),
           ),
-          
+
           // List Artikel
           SliverToBoxAdapter(
             child: Padding(

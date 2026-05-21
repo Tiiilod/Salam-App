@@ -1,16 +1,16 @@
-// lib/screens/dzikir_petang_screen.dart
+// lib/screens/dzikir_pagi_screen.dart
 import 'package:flutter/material.dart';
-import '../models/dzikir_data.dart';
+import '../../models/dzikir_data.dart';
 
-class DzikirPetangScreen extends StatefulWidget {
-  const DzikirPetangScreen({Key? key}) : super(key: key);
+class DzikirPagiScreen extends StatefulWidget {
+  const DzikirPagiScreen({Key? key}) : super(key: key);
 
   @override
-  State<DzikirPetangScreen> createState() => _DzikirPetangScreenState();
+  State<DzikirPagiScreen> createState() => _DzikirPagiScreenState();
 }
 
-class _DzikirPetangScreenState extends State<DzikirPetangScreen> {
-  final List<DzikirItem> _data = DzikirData.petangFull;
+class _DzikirPagiScreenState extends State<DzikirPagiScreen> {
+  final List<DzikirItem> _data = DzikirData.pagiFull;
   late List<int> _counters;
 
   @override
@@ -24,7 +24,7 @@ class _DzikirPetangScreenState extends State<DzikirPetangScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
-        title: const Text('Dzikir Petang', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('Dzikir Pagi', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -54,8 +54,8 @@ class _DzikirPetangScreenState extends State<DzikirPetangScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFFE8EAF6), borderRadius: BorderRadius.circular(20)),
-                        child: Text('Ulangi: ${item.targetSajak}x', style: const TextStyle(color: Colors.indigo, fontSize: 12, fontWeight: FontWeight.bold)),
+                        decoration: BoxDecoration(color: const Color(0xFFFFF9C4), borderRadius: BorderRadius.circular(20)),
+                        child: Text('Ulangi: ${item.targetSajak}x', style: const TextStyle(color: ColorsamberEdge.amberDark, fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                       if (isDone) const Icon(Icons.check_circle, color: Colors.green, size: 22),
                     ],
@@ -70,7 +70,7 @@ class _DzikirPetangScreenState extends State<DzikirPetangScreen> {
                   ElevatedButton(
                     onPressed: isDone ? null : () => setState(() => _counters[index]++),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDone ? Colors.grey.shade300 : const Color(0xFF0D47A1),
+                      backgroundColor: isDone ? Colors.grey.shade300 : const Color(0xFF1B5E20),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -85,4 +85,11 @@ class _DzikirPetangScreenState extends State<DzikirPetangScreen> {
       ),
     );
   }
+}
+
+class ColorsamberEdge {
+  static const Color amberDark = Color(0xFFF57F17);
+}
+extension TextStyleColor on TextStyle {
+  static const TextStyle labelStyle = TextStyle(color: Color(0xFFF57F17));
 }

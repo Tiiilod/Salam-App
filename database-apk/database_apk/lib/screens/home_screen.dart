@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:database_apk/models/doa_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import '../models/doa_model.dart';
 import '../models/prayer_time.dart';
 import '../widgets/prayer_tile.dart';
 import '../widgets/prayer_countdown.dart';
@@ -12,8 +10,8 @@ import '../widgets/doa_button.dart';
 import '../screens/doa_list_screen.dart';
 import '../widgets/doa_dialog.dart';
 import '../screens/qiblah_screen.dart';
-import '../screens/dzikir_pagi_screen.dart'; // Import halaman khusus Dzikir Pagi
-import '../screens/dzikir_petang_screen.dart'; // Import halaman khusus Dzikir Petang
+import 'dzikir screens/dzikir_pagi_screen.dart'; // Import halaman khusus Dzikir Pagi
+import 'dzikir screens/dzikir_petang_screen.dart'; // Import halaman khusus Dzikir Petang
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

@@ -29,7 +29,7 @@ class DoaListScreen extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.menu_book, color: Color(0xFF2E7D32)),
               title: Text(listDoa[index].title),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white,),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => showDoaDialog(context, listDoa[index]),
             ),
           );
