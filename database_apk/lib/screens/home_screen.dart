@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Logo Salam di pojok kiri atas
         title: Image.asset(
           'assets/images/salam_logo.png',
-          height: 28,
+          height: 38,
           fit: BoxFit.contain,
           alignment: Alignment.centerLeft,
           errorBuilder: (context, error, stackTrace) {

@@ -1,5 +1,5 @@
+import 'package:database_apk/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'screens/main_navigation.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         overscroll: false, // Mematikan efek overscroll secara global
       ),
-      home: MainNavigation(),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
