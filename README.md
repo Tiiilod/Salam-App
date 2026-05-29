@@ -1,5 +1,4 @@
-# <img width="40" height="40" alt="Screenshot 2026-05-25 101536" src="https://github.com/user-attachments/assets/9428eef5-1ac5-4541-bbd0-db2c053b6542" />
- Salam - Your Daily Spiritual Companion
+# <img width="40" height="40" alt="Screenshot 2026-05-25 101536" src="https://github.com/user-attachments/assets/9428eef5-1ac5-4541-bbd0-db2c053b6542" /> Salam - Your Daily Spiritual Companion
 
 [![Flutter](https://img.shields.io/badge/Framework-Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Language-Dart-0175C2?logo=dart&logoColor=white)](https://dart.dev)
